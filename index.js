@@ -4,7 +4,7 @@ const app = express();
 const puppeteer = require("puppeteer");
 const cheerio = require("cheerio");
 
-const PORT = 3030;
+const PORT = process.env.PORT || 3030;
 
 const targetURL = "https://newsweb.oslobors.no/";
 
