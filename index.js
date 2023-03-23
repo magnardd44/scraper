@@ -9,34 +9,29 @@ const PORT = process.env.PORT || 3030;
 const targetURL = "https://newsweb.oslobors.no/";
 
 async function scrapeAndReturn() {
-  const browser = await puppeteer.launch({headless: false, executablePath: '/usr/bin/firefox'});
+  const browser = await puppeteer.launch();
   const page = await browser.newPage();
 
   await page.goto(targetURL);
   await page.waitForSelector("table");
 
   const html = await page.content();
-  const $ = cheerio.load(html);
-
-  let allEvents = [];
-
-  $("table tr").each((i, elem) => {
-    const event = {};
-
-    event.time = $(elem).find(".kzwcbj").text();
-    event.utst_id = $(elem).find(".hlFPFz").text();
-    event.title = $(elem).find(".jzDNAp span span:first").text();
-    event.vedlegg = $(elem).find(".edoIV").text();
-    event.kategori = $(elem).find(".ePJIxm span span:first").text();
-
-    allEvents.push(event);
-  });
-
   await browser.close();
 
-  allEvents.shift();
+  const $ = cheerio.load(html);
 
-  return allEvents[0];
+  const elem = $("tbody").children('tr').first();
+
+  const event = {};
+
+  event.time = $(elem).find(".kzwcbj").text();
+  event.utst_id = $(elem).find(".hlFPFz").text();
+  event.title = $(elem).find(".jzDNAp span span:first").text();
+  event.vedlegg = $(elem).find(".edoIV").text();
+  event.kategori = $(elem).find(".ePJIxm span span:first").text();
+  event.url = `${targetURL}${$(elem).find(".gguAuF").attr('href')}`;  
+
+  return event;
 }
 
 app.get("/", (req, res) => {
@@ -44,14 +39,13 @@ app.get("/", (req, res) => {
 });
 
 app.get("/scrape", async (req, res) => {
-  const data = await scrapeAndReturn();
 
-  if (data) {
-    return res.send(data);
-  } else {
-    return res.status(404).send('Klarte ikke å scrape!')
+  try {
+    const data = await scrapeAndReturn();
+    res.send(data);
+  } catch (error) {
+    res.status(500).send("Klarte ikke å scrape!")
   }
-  
 });
 
 app.listen(PORT, async () => {
