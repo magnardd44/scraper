@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 3030;
 const targetURL = "https://newsweb.oslobors.no/";
 
 async function scrapeAndReturn() {
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({headless: false, executablePath: '/usr/bin/firefox'});
   const page = await browser.newPage();
 
   await page.goto(targetURL);
