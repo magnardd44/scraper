@@ -45,7 +45,13 @@ app.get("/", (req, res) => {
 
 app.get("/scrape", async (req, res) => {
   const data = await scrapeAndReturn();
-  return res.send(data);
+
+  if (data) {
+    return res.send(data);
+  } else {
+    return res.status(404).send('Klarte ikke å scrape!')
+  }
+  
 });
 
 app.listen(PORT, async () => {
