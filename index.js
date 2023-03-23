@@ -6,7 +6,7 @@ const cheerio = require("cheerio");
 
 const PORT = 3030;
 
-const targetURL = "https://newsweb.oslobors.no/search?fromDate=2023-03-22";
+const targetURL = "https://newsweb.oslobors.no/";
 
 async function scrapeAndReturn() {
   const browser = await puppeteer.launch();
